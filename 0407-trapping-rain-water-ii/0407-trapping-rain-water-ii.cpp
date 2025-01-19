@@ -1,78 +1,45 @@
 class Solution {
 public:
-    int trapRainWater(vector<vector<int>>& heightMap) {
-        int dRow[4] = {0, 0, -1, 1};
-        int dCol[4] = {-1, 1, 0, 0};
 
-        int numOfRows = heightMap.size();
-        int numOfCols = heightMap[0].size();
+    int trapRainWater(vector<vector<int>>& height) {
+        int n = height.size();
+        int m = height[0].size();
 
-        vector<vector<bool>> visited(numOfRows, vector<bool>(numOfCols, false));
-        priority_queue<Cell> boundary;
+        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
 
-        for (int i = 0; i < numOfRows; i++) {
-            boundary.push(Cell(heightMap[i][0], i, 0));
-            boundary.push(Cell(heightMap[i][numOfCols - 1], i, numOfCols - 1));
-            visited[i][0] = visited[i][numOfCols - 1] = true;
+        vector<vector<int>> vis(n, vector<int>(m));
+
+        for(int i=0; i<n; i++){
+            vis[i][0] = 1;
+            vis[i][m-1] = 1;
+            pq.push({height[i][0], {i, 0}});
+            pq.push({height[i][m-1], {i, m-1}});
         }
-
-        for (int i = 0; i < numOfCols; i++) {
-            boundary.push(Cell(heightMap[0][i], 0, i));
-            boundary.push(Cell(heightMap[numOfRows - 1][i], numOfRows - 1, i));
-            visited[0][i] = visited[numOfRows - 1][i] = true;
+        for(int i=0; i<m; i++){
+            vis[0][i]=1;
+            vis[n-1][i]=1;
+            pq.push({height[0][i], {0, i}});
+            pq.push({height[n-1][i], {n-1, i}});
         }
+        int ans=0;
+        while(!pq.empty()){
+            int h = pq.top().first;
+            int r = pq.top().second.first;
+            int c = pq.top().second.second;
+            pq.pop();
 
-        int totalWaterVolume = 0;
-
-        while (!boundary.empty()) {
-            Cell currentCell = boundary.top();
-            boundary.pop();
-
-            int currentRow = currentCell.row;
-            int currentCol = currentCell.col;
-            int minBoundaryHeight = currentCell.height;
-
-            for (int direction = 0; direction < 4; direction++) {
-                int neighborRow = currentRow + dRow[direction];
-                int neighborCol = currentCol + dCol[direction];
-
-               
-                if (isValidCell(neighborRow, neighborCol, numOfRows,
-                                numOfCols) &&
-                    !visited[neighborRow][neighborCol]) {
-                    int neighborHeight = heightMap[neighborRow][neighborCol];
-
-                    
-                    if (neighborHeight < minBoundaryHeight) {
-                        totalWaterVolume += minBoundaryHeight - neighborHeight;
-                    }
-
-                   
-                    boundary.push(Cell(max(neighborHeight, minBoundaryHeight),
-                                       neighborRow, neighborCol));
-                    visited[neighborRow][neighborCol] = true;
+            int dr[] = {-1, 0, 1, 0};
+            int dc[] = {0, -1, 0, 1};
+            for(int i=0; i<4; i++){
+                int nr = r + dr[i];
+                int nc = c + dc[i];
+                if(nr>=0 && nr<n && nc>=0 && nc<m && !vis[nr][nc]){
+                    ans+=max(0, h-height[nr][nc]);
+                    pq.push({max(h, height[nr][nc]), {nr, nc}});
+                    vis[nr][nc] = 1;
                 }
             }
         }
-
-        return totalWaterVolume;
-    }
-
-private:
-    class Cell {
-    public:
-        int height;
-        int row;
-        int col;
-
-        Cell(int height, int row, int col)
-            : height(height), row(row), col(col) {}
-        bool operator<(const Cell& other) const {
-            return height >= other.height;
-        }
-    };
-
-    bool isValidCell(int row, int col, int numOfRows, int numOfCols) {
-        return row >= 0 && col >= 0 && row < numOfRows && col < numOfCols;
+        return ans;
     }
 };
