@@ -1,29 +1,35 @@
 class Solution {
 public:
     int firstCompleteIndex(vector<int>& arr, vector<vector<int>>& mat) {
-        int numRows = mat.size(), numCols = mat[0].size();
-        vector<int> rCount(numRows), cCount(numCols);
-        unordered_map<int, pair<int, int>> numToPos;
+        unordered_map<int, int> numToIndex;
+        for (int i = 0; i < arr.size(); i++) {
+            numToIndex[arr[i]] = i;
+        }
+
+        int result = INT_MAX;
+        int numRows = mat.size();
+        int numCols = mat[0].size();
 
         for (int row = 0; row < numRows; row++) {
+            int lastElementIndex = INT_MIN;
             for (int col = 0; col < numCols; col++) {
-                int value = mat[row][col];
-                numToPos[value] = {row, col};
+                int indexVal = numToIndex[mat[row][col]];
+                lastElementIndex = max(lastElementIndex, indexVal);
             }
+            
+            result = min(result, lastElementIndex);
         }
 
-        for (int i = 0; i < arr.size(); i++) {
-            int num = arr[i];
-            auto [row, col] = numToPos[num];
-
-            rCount[row]++;
-            cCount[col]++;
-
-            if (rCount[row] == numCols || cCount[col] == numRows) {
-                return i;
+        for (int col = 0; col < numCols; col++) {
+            int lastElementIndex = INT_MIN;
+            for (int row = 0; row < numRows; row++) {
+                int indexVal = numToIndex[mat[row][col]];
+                lastElementIndex = max(lastElementIndex, indexVal);
             }
+            
+            result = min(result, lastElementIndex);
         }
 
-        return -1;  
+        return result;
     }
 };
