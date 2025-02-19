@@ -1,31 +1,29 @@
 class Solution {
 public:
     string getHappyString(int n, int k) {
-        string currentString = "";
-        vector<string> happyStrings;
-        generateHappyStrings(n, currentString, happyStrings);
+        stack<string> stringsStack;
+        int indexInSortedList = 0;
+        stringsStack.push(""); 
 
-        if (happyStrings.size() < k) return "";
+        while (stringsStack.size() > 0) {
+            string currentString = stringsStack.top();
+            stringsStack.pop();
 
-        sort(happyStrings.begin(), happyStrings.end());
-
-        return happyStrings[k - 1];
-    }
-
-private:
-    void generateHappyStrings(int n, string currentString,
-                              vector<string> &happyStrings) {
-        
-        if (currentString.size() == n) {
-            happyStrings.push_back(currentString);
-            return;
-        }
-
-        for (char currentChar = 'a'; currentChar <= 'c'; currentChar++) {
-            if (currentString.size() > 0 && currentString.back() == currentChar)
+            if (currentString.size() == n) {
+                indexInSortedList++;
+                if (indexInSortedList == k) {
+                    return currentString;
+                }
                 continue;
+            }
 
-            generateHappyStrings(n, currentString + currentChar, happyStrings);
+            for (char currentChar = 'c'; currentChar >= 'a'; currentChar--) {
+                if (currentString.size() > 0 &&
+                    currentString.back() == currentChar)
+                    continue;
+                stringsStack.push(currentString + currentChar);
+            }
         }
+        return "";
     }
 };
