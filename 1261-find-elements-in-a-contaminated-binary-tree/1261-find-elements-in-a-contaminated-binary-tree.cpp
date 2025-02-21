@@ -1,29 +1,28 @@
 class FindElements {
-    unordered_set<int> seen;
-
 public:
-    FindElements(TreeNode* root) { bfs(root); }
+    unordered_map<int, bool> mp;
 
-    bool find(int target) { return seen.find(target) != seen.end(); }
-
-private:
-    void bfs(TreeNode* root) {
-        queue<TreeNode*> queue;
-        root->val = 0;
-        queue.push(root);
-
-        while (!queue.empty()) {
-            TreeNode* currentNode = queue.front();
-            queue.pop();
-            seen.insert(currentNode->val);
-            if (currentNode->left) {
-                currentNode->left->val = currentNode->val * 2 + 1;
-                queue.push(currentNode->left);
-            }
-            if (currentNode->right) {
-                currentNode->right->val = currentNode->val * 2 + 2;
-                queue.push(currentNode->right);
-            }
+    void recover(TreeNode* root) {
+        if (!root) return;
+        if (root->left) {
+            root->left->val = root->val * 2 + 1;
+            mp[root->left->val] = true;
+            recover(root->left);
         }
+        if (root->right) {
+            root->right->val = root->val * 2 + 2;
+            mp[root->right->val] = true;
+            recover(root->right);
+        }
+    }
+
+    FindElements(TreeNode* root) {
+        root->val = 0;
+        mp[0] = true;
+        recover(root);
+    }
+    
+    bool find(int target) {
+        return mp.find(target) != mp.end();
     }
 };
