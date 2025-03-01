@@ -2,22 +2,21 @@ class Solution {
 public:
     vector<int> applyOperations(vector<int>& nums) {
         int n = nums.size();
-        vector<int> modifiedNums;
         for (int index = 0; index < n - 1; index++) {
             if (nums[index] == nums[index + 1] && nums[index] != 0) {
                 nums[index] *= 2;
                 nums[index + 1] = 0;
             }
         }
-        for (int num : nums) {
-            if (num != 0) {
-                modifiedNums.push_back(num);
+        int nonZeroIndex = 0;
+        for (int iterateIndex = 0; iterateIndex < n; iterateIndex++) {
+            if (nums[iterateIndex] != 0) {
+                nums[nonZeroIndex++] = nums[iterateIndex];
             }
         }
-        while (modifiedNums.size() < n) {
-            modifiedNums.push_back(0);
+        while (nonZeroIndex < n) {
+            nums[nonZeroIndex++] = 0;
         }
-
-        return modifiedNums;
+        return nums;
     }
 };
